@@ -10,6 +10,11 @@ import shap
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Header
+)
 
 
 # ============================================================
@@ -92,7 +97,36 @@ app = FastAPI(
     version=str(MODEL_VERSION)
 )
 
+# ============================================================
+# API SECURITY
+# ============================================================
 
+API_KEY = os.environ.get("API_KEY")
+
+if not API_KEY:
+    logger.warning(
+        "API_KEY environment variable is not configured."
+    )
+
+
+def verify_api_key(
+    x_api_key: str | None
+):
+    """
+    Verify API key sent by the client.
+    """
+
+    if not API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="API security is not configured."
+        )
+
+    if x_api_key != API_KEY:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API key."
+        )
 # ============================================================
 # CORS
 # ============================================================
@@ -449,7 +483,12 @@ def model_info():
 # ============================================================
 
 @app.post("/predict")
-def predict(request: AthleteRequest):
+def predict(
+    request: AthleteRequest,
+    x_api_key: str | None = Header(default=None)
+):
+
+    verify_api_key(x_api_key)
 
     try:
 
