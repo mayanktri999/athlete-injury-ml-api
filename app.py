@@ -444,7 +444,7 @@ def root():
 # HEALTH ENDPOINT
 # ============================================================
 
-@app.get("/health")
+@app.get("/api/v1/health")
 def health():
 
     return {
@@ -458,7 +458,7 @@ def health():
 # MODEL INFO ENDPOINT
 # ============================================================
 
-@app.get("/model-info")
+@app.get("/api/v1/model-info")
 def model_info():
 
     return {
@@ -482,7 +482,7 @@ def model_info():
 # PREDICT ENDPOINT
 # ============================================================
 
-@app.post("/predict")
+@app.post("/api/v1/predict")
 def predict(
     request: AthleteRequest,
     x_api_key: str | None = Header(default=None)
